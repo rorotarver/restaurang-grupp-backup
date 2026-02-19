@@ -1,27 +1,25 @@
-const createRestaurant = async () => {
-  const response = await fetch(
-    "https://school-restaurant-api.azurewebsites.net/api/restaurant/create",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: "Fantastic Food",
-        address: {
-          street: "Fantastic Street 123",
-          city: "Stockholm",
-          zip: "12345",
-        },
-      }),
-    },
-  );
+import { BookingResponseType } from '../types/booking.types';
 
-  const data = await response.json();
-  console.log(data);
+const BASE_URL = 'https://school-restaurant-api.azurewebsites.net';
 
-  const restaurantId = data.id;
-  console.log("Restaurant ID:", restaurantId);
+export const fetchBooking = async (bookingId: string): Promise<BookingResponseType> => {
+    const response = await fetch(`${BASE_URL}/booking/${bookingId}`);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch booking: ${response.statusText}`);
+    }
+    return response.json();
 };
 
-createRestaurant();
+export const getBookingsByRestaurant = async (
+    restaurantId: string,
+): Promise<BookingResponseType[]> => {
+    const response = await fetch(
+        `${BASE_URL}/booking/restaurant/${restaurantId}`,
+    );
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch bookings for restaurant');
+    }
+
+    return response.json();
+};
