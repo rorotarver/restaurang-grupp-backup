@@ -8,30 +8,33 @@ import {
 
 const BASE_URL = 'https://school-restaurant-api.azurewebsites.net';
 
+const errorMessage = (response: Response) => `API request failed with status ${response.status}: ${response.statusText}`;
+
 export const fetchBooking = async (bookingId: string): Promise<BookingResponseType> => {
-    const response = await fetch(`${BASE_URL}/booking/${bookingId}`);
+    const response = await fetch(`${BASE_URL}/booking/${encodeURIComponent(bookingId)}`);
     if (!response.ok) {
-        throw new Error(`Failed to fetch booking: ${response.statusText}`);
+        throw new Error(errorMessage(response));
     }
-    const data: BookingResponseType[] = await response.json();
-    if (data.length === 0) {
+    const data: BookingResponseType = await response.json();
+    if (!data) {
         throw new Error('Booking not found');
     }
-    return data[0];
+    return data;
 };
 
 export const getBookingsByRestaurant = async (
     restaurantId: string,
 ): Promise<BookingResponseType[]> => {
     const response = await fetch(
-        `${BASE_URL}/booking/restaurant/${restaurantId}`,
+        `${BASE_URL}/booking/restaurant/${encodeURIComponent(restaurantId)}`,
     );
 
     if (!response.ok) {
-        throw new Error(`Failed to fetch bookings for restaurant: ${response.statusText}`);
+        throw new Error(errorMessage(response));
     }
 
-    return response.json();
+    const data: BookingResponseType[] = await response.json();
+    return data;
 };
 
 export const createBooking = async (
@@ -46,8 +49,13 @@ export const createBooking = async (
     });
 
     if (!response.ok) {
-        throw new Error(`Failed to create booking: ${response.statusText}`);
+        throw new Error(errorMessage(response));
     }
 
-    return response.json();
+    const data: CreateBookingResponse = await response.json();
+    if (!data) {
+        throw new Error('Failed to create booking');
+    }
+
+    return data;
 };
