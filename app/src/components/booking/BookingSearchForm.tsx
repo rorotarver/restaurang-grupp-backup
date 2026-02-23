@@ -36,7 +36,7 @@ const initialState: State = {     // Initialt state för komponenten innan anvä
     isLoading: false,
     error: null,
     hasSearched: false,
-}
+};
 
 function reducer(state: State, action: Action): State {    // Reducerfunktion som hanterar state-uppdateringar baserat på actions
     switch (action.type) {
@@ -57,26 +57,74 @@ function reducer(state: State, action: Action): State {    // Reducerfunktion so
         default:
             return state;
     }
-}
+};
 
 export default function BookingSearchForm() {  
-    const[date, setDate] = useState('');
-    const[numberOfGuests, setNumberOfGuests] = useState(1);
-    const availableTimes = ['18:00', '19:00', '20:00']; // Exempel på tillgängliga tider
-    const [error, setError] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [hasSearched, setHasSearched] = useState(false);
+    const [state, dispatch] = useReducer(reducer, initialState);  
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSearch = async (e: FormEvent) => { // Funktion som hanterar sökningen efter tillgängliga tider när användaren skickar in formuläret
         e.preventDefault();
+
+        if (!state.date) {
+            dispatch({ type: 'SEARCH_FAILURE', payload: 'Vänligen välj ett datum' }); // Validering för att säkerställa att ett datum har valts
+            return;
+        }
+
+        if (state.numberOfGuests < 1) {
+            dispatch({ type: 'SEARCH_FAILURE', payload: 'Antal gäster måste vara minst 1' });
+            return;
+        }
+        
+        dispatch({ type: 'SEARCH_START' });
+
         try {
-            const payload = {
-                restaurantId: '6996f44b1f79230601108db6', // Ersätt med korrekt restaurantId
-                date,
-                time: '19:00', // Exempel på tid, kan göras dynamisk
-                numberOfGuests,
-                customer: {
-                    name: 'John',
-                    lastname: 'Doe',
-                    email: '',
-}
+            const bookings = await getBookingsByRestaurant(RESTAURANT_ID);
+            const sameDate = bookings.filter((b) => b.date === state.date);
+
+            const bookedAt18 = sameDate.filter((b) => b.time === '18:00').length;
+            const bookedAt21 = sameDate.filter((b) => b.time === '21:00').length;
+
+            const availableTimes: string [] = [];
+            if (bookedAt18 < 15) availableTimes.push('18:00');
+            if (bookedAt21 < 15) availableTimes.push('21:00');
+
+            dispatch({ type: 'SEARCH_SUCCESS', payload: availableTimes });
+                
+        } catch {
+            dispatch({ type: 'SEARCH_FAILURE', payload: 'Ett fel uppstod vid hämtning av bokningar' });
+        }
+    };
+
+    return (
+        <section>
+            <form onSubmit={handleSearch} className="space-y-4">
+                <input type='date' value={state.date} onChange={(e) => dispatch({ type: 'SET_DATE', payload: e.target.value })} className="border p-2 w-full" />
+                <input type='number' min={1} max={6} value={state.numberOfGuests} onChange={(e) => dispatch({ type: 'SET_NUMBER_OF_GUESTS', payload: Number(e.target.value) })} className="border p-2 w-full" />
+                <button type='submit' disabled={state.isLoading} className="bg-blue-500 text-white px-4 py-2">{state.isLoading ? 'Söker...' : 'Sök tider'}</button>
+            </form>
+
+            {state.error && <p className="text-red-500 mt-2">{state.error}</p>}
+
+            {state.hasSearched && !state.error && state.availableTimes.length === 0 && (
+                <p className="text-gray-500 mt-2">Inga tillgängliga tider</p>
+            )}
+
+            {state.availableTimes.length > 0 && (
+                <div className="mt-4">
+                    <p className="text-green-500 mb-2">Tillgängliga tider:</p>
+                    <ul>
+                        {state.availableTimes.map((time) => (
+                            <label key={time}>
+                                {time}
+                                <input type="radio" name="time" value={time} onChange={() => dispatch({ type: 'SELECT_TIME', payload: time })} />
+                            </label>
+                        ))}
+                    </ul>
+                </div>
+            )}
+        </section>
+    )
+   
+                }
+  
+
