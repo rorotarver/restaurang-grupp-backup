@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useReducer} from 'react';
+import { FormEvent, useReducer } from 'react';
 import { getBookingsByRestaurant } from '../../services/BookingService';
 
 const RESTAURANT_ID = '6996f44b1f79230601108db6'; // Ersätt med korrekt restaurantId
@@ -12,6 +12,7 @@ const RESTAURANT_ID = '6996f44b1f79230601108db6'; // Ersätt med korrekt restaur
 type State = {   
     date: string;
     numberOfGuests: number;
+    selectionError: string | null;
     availableTimes: string[];
     selectedTime: string | null;
     isLoading: boolean;
@@ -23,6 +24,8 @@ type State = {
 type Action =                                      
     | { type: 'SET_DATE'; payload: string }
     | { type: 'SET_NUMBER_OF_GUESTS'; payload: number }
+    | { type: 'SET_SELECTION_ERROR'; payload: string }
+    | { type: 'CLEAR_SELECTION_ERROR' }
     | { type: 'SEARCH_START' }
     | { type: 'SEARCH_SUCCESS'; payload: string[] }
     | { type: 'SEARCH_FAILURE'; payload: string }
@@ -32,6 +35,7 @@ type Action =
 const initialState: State = {     // Initialt state för komponenten innan användaren har gjort någon interaktion
     date: '',
     numberOfGuests: 1,
+    selectionError: null,
     availableTimes: [],
     selectedTime: null,
     isLoading: false,
@@ -39,20 +43,34 @@ const initialState: State = {     // Initialt state för komponenten innan anvä
     hasSearched: false,
 };
 
+export type SelectedBookingSlot = {
+    date: string;
+    time: string;
+    numberOfGuests: number;
+}
+
+type BookingSearchFormProps = {
+    onBookingSlotSelected: (slot: SelectedBookingSlot) => void;
+}
+
 function reducer(state: State, action: Action): State {    // Reducerfunktion som hanterar state-uppdateringar baserat på actions
     switch (action.type) {
         case 'SET_DATE':
-            return { ...state, date: action.payload };
+            return { ...state, date: action.payload, selectionError: null, selectedTime: null, availableTimes: [], hasSearched: false };
         case 'SET_NUMBER_OF_GUESTS':
-            return { ...state, numberOfGuests: action.payload };
+            return { ...state, numberOfGuests: action.payload, selectionError: null, selectedTime: null, availableTimes: [], hasSearched: false };
+        case 'SET_SELECTION_ERROR':
+            return { ...state, selectionError: action.payload };
+        case 'CLEAR_SELECTION_ERROR':
+            return { ...state, selectionError: null };
         case 'SEARCH_START':
-            return { ...state, isLoading: true, error: null };
+            return { ...state, isLoading: true, error: null, selectionError: null, availableTimes: [], selectedTime: null };
         case 'SEARCH_SUCCESS':
             return { ...state, isLoading: false, availableTimes: action.payload, hasSearched: true };
         case 'SEARCH_FAILURE':
             return { ...state, isLoading: false, error: action.payload };
         case 'SELECT_TIME':
-            return { ...state, selectedTime: action.payload };
+            return { ...state, selectedTime: action.payload, selectionError: null };
         case 'RESET_SEARCH':
             return initialState;
         default:
@@ -60,11 +78,24 @@ function reducer(state: State, action: Action): State {    // Reducerfunktion so
     }
 };
 
-export default function BookingSearchForm() {  
+export default function BookingSearchForm({ onBookingSlotSelected }: BookingSearchFormProps) {  
     const [state, dispatch] = useReducer(reducer, initialState);  
-
+    let buttonText = 'Sök tider';
+    
+    if (state.hasSearched && state.availableTimes.length > 0) buttonText = 'Fortsätt';
+    
     const handleSearch = async (e: FormEvent) => { 
         e.preventDefault();
+
+        if (state.hasSearched && state.availableTimes.length > 0 && !state.selectedTime) {
+            dispatch({ type: 'SET_SELECTION_ERROR', payload: 'Vänligen välj en tid' });
+            return;
+        }
+
+        if (state.hasSearched && state.selectedTime) {
+            onBookingSlotSelected({ date: state.date, time: state.selectedTime, numberOfGuests: state.numberOfGuests });
+            return;
+        }
 
         // Affärsregel från uppgiften: antal gäster måste vara 1-6 och datum måste vara valt innan API-anrop.
         if (!state.date) {
@@ -103,10 +134,11 @@ export default function BookingSearchForm() {
             <form onSubmit={handleSearch} className="space-y-4">
                 <input type='date' value={state.date} onChange={(e) => dispatch({ type: 'SET_DATE', payload: e.target.value })} className="border p-2 w-full" />
                 <input type='number' min={1} max={6} value={state.numberOfGuests} onChange={(e) => dispatch({ type: 'SET_NUMBER_OF_GUESTS', payload: Number(e.target.value) })} className="border p-2 w-full" />
-                <button type='submit' disabled={state.isLoading} className="bg-blue-500 text-white px-4 py-2">{state.isLoading ? 'Söker...' : 'Sök tider'}</button>
+                <button type='submit' disabled={state.isLoading} className="bg-blue-500 text-white px-4 py-2">{state.isLoading ? 'Söker...' : buttonText}</button>
             </form>
 
             {state.error && <p className="text-red-500 mt-2">{state.error}</p>}
+            {state.selectionError && <p className="text-red-500 mt-2">{state.selectionError}</p>}
 
             {state.hasSearched && !state.error && state.availableTimes.length === 0 && (
                 // Tom lista är ett giltigt sökresultat (inte API-fel): betyder fullbokat för vald dag.
@@ -120,7 +152,9 @@ export default function BookingSearchForm() {
                         {state.availableTimes.map((time) => (
                             <label key={time} className="flex items-center space-x-2">
                                 {time}
-                                <input type="radio" name="time" value={time} onChange={() => dispatch({ type: 'SELECT_TIME', payload: time })} />
+                                <input type="radio" name="time" value={time} onChange={() => {
+                                    dispatch({ type: 'SELECT_TIME', payload: time });
+                                }} />
                             </label>
                         ))}
                     </ul>
