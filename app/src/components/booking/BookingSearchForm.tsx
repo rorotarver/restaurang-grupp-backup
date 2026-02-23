@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useReducer, useState } from 'react';
+import { FormEvent, useReducer} from 'react';
 import { getBookingsByRestaurant } from '../../services/BookingService';
 
 const RESTAURANT_ID = '6996f44b1f79230601108db6'; // Ersätt med korrekt restaurantId
@@ -8,8 +8,8 @@ const RESTAURANT_ID = '6996f44b1f79230601108db6'; // Ersätt med korrekt restaur
 
 
 
-
-type State = {    // Typdefinition för komponentens state
+// Bokningsflödets UI-state: sökinput, async-status och resultat av tillgängliga tider.
+type State = {   
     date: string;
     numberOfGuests: number;
     availableTimes: string[];
@@ -19,7 +19,8 @@ type State = {    // Typdefinition för komponentens state
     hasSearched: boolean;
 };
 
-type Action =                                      // Typdefinition för reducer actions, vilka actions som är tillåtna och vilken payload de har
+// Actions beskriver alla tillåtna state-övergångar i formulärflödet (input -> sök -> resultat/fel).
+type Action =                                      
     | { type: 'SET_DATE'; payload: string }
     | { type: 'SET_NUMBER_OF_GUESTS'; payload: number }
     | { type: 'SEARCH_START' }
@@ -62,16 +63,17 @@ function reducer(state: State, action: Action): State {    // Reducerfunktion so
 export default function BookingSearchForm() {  
     const [state, dispatch] = useReducer(reducer, initialState);  
 
-    const handleSearch = async (e: FormEvent) => { // Funktion som hanterar sökningen efter tillgängliga tider när användaren skickar in formuläret
+    const handleSearch = async (e: FormEvent) => { 
         e.preventDefault();
 
+        // Affärsregel från uppgiften: antal gäster måste vara 1-6 och datum måste vara valt innan API-anrop.
         if (!state.date) {
-            dispatch({ type: 'SEARCH_FAILURE', payload: 'Vänligen välj ett datum' }); // Validering för att säkerställa att ett datum har valts
+            dispatch({ type: 'SEARCH_FAILURE', payload: 'Vänligen välj ett datum' }); 
             return;
         }
 
-        if (state.numberOfGuests < 1) {
-            dispatch({ type: 'SEARCH_FAILURE', payload: 'Antal gäster måste vara minst 1' });
+        if (state.numberOfGuests < 1 || state.numberOfGuests > 6) {
+            dispatch({ type: 'SEARCH_FAILURE', payload: 'Antal gäster måste vara mellan 1 och 6' });
             return;
         }
         
@@ -85,6 +87,7 @@ export default function BookingSearchForm() {
             const bookedAt21 = sameDate.filter((b) => b.time === '21:00').length;
 
             const availableTimes: string [] = [];
+            // Tillgänglighet beräknas per sittning: restaurangen har 15 bord kl 18:00 och 15 bord kl 21:00.
             if (bookedAt18 < 15) availableTimes.push('18:00');
             if (bookedAt21 < 15) availableTimes.push('21:00');
 
@@ -106,6 +109,7 @@ export default function BookingSearchForm() {
             {state.error && <p className="text-red-500 mt-2">{state.error}</p>}
 
             {state.hasSearched && !state.error && state.availableTimes.length === 0 && (
+                // Tom lista är ett giltigt sökresultat (inte API-fel): betyder fullbokat för vald dag.
                 <p className="text-gray-500 mt-2">Inga tillgängliga tider</p>
             )}
 
@@ -114,7 +118,7 @@ export default function BookingSearchForm() {
                     <p className="text-green-500 mb-2">Tillgängliga tider:</p>
                     <ul>
                         {state.availableTimes.map((time) => (
-                            <label key={time}>
+                            <label key={time} className="flex items-center space-x-2">
                                 {time}
                                 <input type="radio" name="time" value={time} onChange={() => dispatch({ type: 'SELECT_TIME', payload: time })} />
                             </label>
