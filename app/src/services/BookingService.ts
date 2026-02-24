@@ -59,3 +59,13 @@ export const createBooking = async (
 
     return data;
 };
+
+export const deleteBooking = async (bookingId: string): Promise<void> => {
+    const response = await fetch(`${BASE_URL}/booking/${encodeURIComponent(bookingId)}`, {
+        method: 'DELETE',
+    });
+
+    if (!response.ok) {
+        throw new Error(errorMessage(response));
+    }
+};

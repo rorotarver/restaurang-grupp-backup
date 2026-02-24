@@ -42,8 +42,6 @@ export default function Home() {
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-white/50 sm:items-start">
         <button onClick={createRestaurant}>Skapa</button>
         <LandingPage />
-        <BookingPage />
-        {/* <BookingSearchForm /> */}
       </main>
     </div>
   );
