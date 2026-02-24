@@ -1,8 +1,9 @@
 "use client";
 
+
 export const Hero = () => {
     return (
-        <section className="flex flex-col items-center justify-center text-center px-6 py-28 bg-cover bg-center" style={{ backgroundImage: "url('/app/src/img/2Q.png')" }}>
+        <section className="flex flex-col items-center justify-center text-center px-6 py-28 bg-cover bg-center">
             <div className="bg-black/50 p-10 rounded-2xl">
                 <h2 className="text-5xl font-bold text-white mb-6">
                     Autentisk Persisk Mat
