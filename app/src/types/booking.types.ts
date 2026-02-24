@@ -31,3 +31,13 @@ export interface CreateBookingResponse {
     numberOfGuests: number;
     customerId: string;
 }
+
+export interface AdminBookingResponseType {
+    id: string;
+    restaurantId: string;
+    date: string;
+    time: string;
+    numberOfGuests: number;
+    customerId: string;
+    
+}

@@ -1,9 +1,8 @@
-import { Booking } from '../../types/booking.types';
-import { Button } from '../ui/Button';
+import { AdminBookingResponseType } from "../../types/booking.types";
 
 type Props = {
-	bookings: Booking[];
-	onEdit: (booking: Booking) => void;
+	bookings: AdminBookingResponseType[];
+	onEdit: (booking: AdminBookingResponseType) => void;
 	onDelete: (bookingId: string) => void;
 	loading?: boolean;
 };
@@ -18,25 +17,25 @@ export const BookingList = ({ bookings, onEdit, onDelete, loading }: Props) => {
 					<li key={booking.id} className="booking-item">
 						<div>
 							<p>
-								<strong>{booking.customer.lastname}</strong>
+								<strong>{booking.customerId}</strong>
 							</p>
 							<p>
 								{booking.date} kl {booking.time} · {booking.numberOfGuests} gäster
 							</p>
-							<p>{booking.customer.email}</p>
+							<p>{booking.customerId}</p>
 						</div>
 						<div className="row gap-sm">
-							<Button type="button" className="btn-secondary" onClick={() => onEdit(booking)}>
+							<button type="button" className="btn-secondary" onClick={() => onEdit(booking)}>
 								Redigera
-							</Button>
-							<Button
+							</button>
+							<button
 								type="button"
 								className="btn-danger"
 								onClick={() => onDelete(booking.id)}
 								disabled={loading}
 							>
 								Avboka
-							</Button>
+							</button>
 						</div>
 					</li>
 				))}
