@@ -32,6 +32,15 @@ export interface CreateBookingResponse {
     customerId: string;
 }
 
+export interface UpdateBookingPayload {
+    id: string;
+    restaurantId: string;
+    date: string;
+    time: string;
+    numberOfGuests: number;
+    customerId: string;
+}
+
 export type BookingFormData = Omit<BookingResponseType, 'id' | 'customerId' | 'restaurantId'>;
 
   

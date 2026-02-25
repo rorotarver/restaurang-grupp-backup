@@ -62,7 +62,14 @@ export default function AdminPanel() {
 
         try {
           if (editingBooking) {
-            const updated = await updateBooking(editingBooking.id, formData);
+            const updated = await updateBooking(editingBooking.id, {
+              id: editingBooking.id,
+              restaurantId: editingBooking.restaurantId,
+              customerId: editingBooking.customerId,
+              date: formData.date,
+              time: formData.time,
+              numberOfGuests: formData.numberOfGuests,
+            });
             setBookings((prev) =>
               prev.map((b) => (b.id === updated.id ? updated : b))
             );
@@ -77,6 +84,7 @@ export default function AdminPanel() {
                 phone: "0712345678",
               },
             });
+            await fetchBookings();
             setBookings((prev) => [...prev, newBooking]);
           }
           closeForm();
