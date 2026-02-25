@@ -14,7 +14,7 @@ export const Hero = () => {
                   Färska råvaror, traditionella recept och en varm atmosfär.
                 </p>
 
-                <Link href="/BookingPage" className="bg-orange-500 hover:bg-orange-600 text-black px-8 py-3 rounded-2xl shadow-lg transition">
+                <Link href="/booking" className="bg-orange-500 hover:bg-orange-600 text-black px-8 py-3 rounded-2xl shadow-lg transition">
                     Boka Här
                 </Link>
 

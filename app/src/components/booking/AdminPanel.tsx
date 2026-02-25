@@ -1,13 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from "react";
-import { deleteBooking, getBookingsByRestaurant, updateBooking, createBooking } from "../services/BookingService";
-import { BookingFormData, BookingResponseType } from "../types/booking.types";
+import { deleteBooking, getBookingsByRestaurant, updateBooking, createBooking } from "../../services/BookingService";
+import { BookingFormData, BookingResponseType } from "../../types/booking.types";
 
-
-
-
-export default function AdminPage() {
+export default function AdminPanel() {
     const [bookings, setBookings] = useState<BookingResponseType[]>([]);
     const [loading, setLoading] = useState(false);
     const [fetchError, setFetchError] = useState<string | null>(null);
@@ -26,8 +23,6 @@ export default function AdminPage() {
         process.env.NEXT_PUBLIC_RESTAURANT_ID || '6996f44b1f79230601108db6';
 
     const fetchBookings = useCallback(async () => {
-
-
         try {
             setLoading(true);
             setFetchError(null);
@@ -41,72 +36,66 @@ export default function AdminPage() {
             setLoading(false);
         }
     }, [restaurantId]);
-    
+
     useEffect(() => {
       fetchBookings();
-},    [fetchBookings]);
+    }, [fetchBookings]);
 
-const openCreateForm = () => {
-    setFormData({ date: "", time: "18:00", numberOfGuests: 1 });
-    setEditingBooking(null);
-    setIsCreating(true);
-    setFormError(null);
-  };
+    const openCreateForm = () => {
+        setFormData({ date: "", time: "18:00", numberOfGuests: 1 });
+        setEditingBooking(null);
+        setIsCreating(true);
+        setFormError(null);
+    };
 
-const closeForm = () => {
-    setEditingBooking(null);
-    setIsCreating(false);
-    setFormError(null);
-  };
+    const closeForm = () => {
+        setEditingBooking(null);
+        setIsCreating(false);
+        setFormError(null);
+    };
 
-const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!restaurantId) return setFormError("Restaurant ID saknas");
-    setIsSaving(true);
-    setFormError(null);
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!restaurantId) return setFormError("Restaurant ID saknas");
+        setIsSaving(true);
+        setFormError(null);
 
-    try {
-      if (editingBooking) {
-        // PUT /api/bookings/:id
-        const updated = await updateBooking(editingBooking.id, formData);
-        setBookings((prev) =>
-          prev.map((b) => (b.id === updated.id ? updated : b))
+        try {
+          if (editingBooking) {
+            const updated = await updateBooking(editingBooking.id, formData);
+            setBookings((prev) =>
+              prev.map((b) => (b.id === updated.id ? updated : b))
+            );
+          } else if (isCreating) {
+            const newBooking = await createBooking({
+              restaurantId,
+              ...formData,
+              customer: {
+                name: "Admin",
+                lastname: "User",
+                email: "example@example.com",
+                phone: "0712345678",
+              },
+            });
+            setBookings((prev) => [...prev, newBooking]);
+          }
+          closeForm();
+          setFormData({ date: "", time: "18:00", numberOfGuests: 1 });
+        } catch (err: unknown) {
+          setFormError(err instanceof Error ? err.message : "Ett okänt fel uppstod");
+        } finally {
+          setIsSaving(false);
+        }
+    };
+
+    const handleDeleteBooking = async (bookingId: string) => {
+        const shouldDelete = window.confirm(
+            'Är du säker på att du vill ta bort bokningen?'
         );
-      } else if (isCreating) {
-        // POST /api/bookings
-        const newBooking = await createBooking({
-          restaurantId,
-          ...formData,
-          customer: {
-            name: "Admin",
-            lastname: "User",
-            email: "example@example.com",
-            phone: "0712345678",
-          },
-        });
-        setBookings((prev) => [...prev, newBooking]);
-      }
-      closeForm();
-      setFormData({ date: "", time: "18:00", numberOfGuests: 1 });
-    } catch (err: unknown) {
-      setFormError(err instanceof Error ? err.message : "Ett okänt fel uppstod");
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
-  // Ta bort bokning
-
-
-const handleDeleteBooking = async (bookingId: string) => {
-    const shouldDelete = window.confirm(
-        'Är du säker på att du vill ta bort bokningen?'
-    );
-
-    if (!shouldDelete) {
-        return;
-    }
-
+        if (!shouldDelete) {
+            return;
+        }
 
         try {
             setDeletingBookingId(bookingId);
@@ -120,14 +109,11 @@ const handleDeleteBooking = async (bookingId: string) => {
         }
     };
 
-
-
    return (
     <div className="flex min-h-screen items-start justify-center bg-zinc-50 font-sans dark:bg-black p-6">
       <div className="w-full max-w-4xl bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
         <h1 className="text-2xl font-bold mb-4">Admin - Bokningar</h1>
 
-        {/* Create-knapp */}
         <button aria-label="Skapa ny bokning"
           type="button"
           className="mb-4 bg-green-500 text-white px-4 py-2 rounded"
@@ -136,7 +122,6 @@ const handleDeleteBooking = async (bookingId: string) => {
           Skapa ny bokning
         </button>
 
-        {/* Formulär för Create/Edit */}
         {(editingBooking || isCreating) && (
           <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
             <h2 className="text-xl font-bold mb-2">
