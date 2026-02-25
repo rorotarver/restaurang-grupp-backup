@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from "react";
-import { getBookingsByRestaurant } from "../services/BookingService";
-import { BookingResponseType } from "../types/booking.types";
+import { deleteBooking, getBookingsByRestaurant } from "../services/BookingService";
+import { BookingFormData, BookingResponseType } from "../types/booking.types";
 
 
 
@@ -10,6 +10,14 @@ export default function AdminPage() {
     const [bookings, setBookings] = useState<BookingResponseType[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [deletingBookingId, setDeletingBookingId] = useState<string | null>(null);
+    const [editingBooking, setEditingBooking] = useState<BookingResponseType | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const [formData, setFormData] = useState<BookingFormData>({
+        date: '',
+        time: '18:00',
+        numberOfGuests: 1,
+    });
 
     const restaurantId =
         process.env.NEXT_PUBLIC_RESTAURANT_ID || '6996f44b1f79230601108db6';
@@ -32,6 +40,24 @@ export default function AdminPage() {
     useEffect(() => {
       fetchBookings();
 },    [fetchBookings]);
+
+    const handleDeleteBooking = async (bookingId: string) => {
+        const shouldDelete = window.confirm('Är du säker på att du vill ta bort bokningen?');
+        if (!shouldDelete) {
+            return;
+        }
+
+        try {
+            setDeletingBookingId(bookingId);
+            setError(null);
+            await deleteBooking(bookingId);
+            setBookings((previous) => previous.filter((booking) => booking.id !== bookingId));
+        } catch (err) {
+            setError((err as Error).message);
+        } finally {
+            setDeletingBookingId(null);
+        }
+    };
 
 
     if (loading) {
@@ -76,8 +102,17 @@ export default function AdminPage() {
                                 <td className="py-2 px-4">{booking.numberOfGuests}</td>
                                 <td className="py-2 px-4">{booking.customerId}</td>
                                 <td className="py-2 px-4">
-                                   <button className="text-blue-500 mr-2">Redigera</button>
-                                   <button className="text-red-500">Ta bort</button>
+                                   <button className="text-blue-500 mr-2" aria-label={`Redigera bokning ${booking.id}`} onClick={() => { 
+                                    setEditingBooking(booking); 
+                                    setFormData(booking); }}>Redigera</button>
+                                   <button
+                                       className="text-red-500 disabled:opacity-50"
+                                       aria-label={`Ta bort bokning ${booking.id}`}
+                                       onClick={() => handleDeleteBooking(booking.id)}
+                                       disabled={deletingBookingId === booking.id}
+                                   >
+                                       {deletingBookingId === booking.id ? 'Tar bort...' : 'Ta bort'}
+                                   </button>
                                 </td>
                             </tr>
                         ))}
