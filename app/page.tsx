@@ -2,7 +2,6 @@
 
 
 import LandingPage from "./src/LandingPageComponents/LandingPage";
-import BookingPage from "./src/pages/BookingPage";
 
 
 // Det här vårat id till api:et 6996f44b1f79230601108db6
