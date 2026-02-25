@@ -60,6 +60,7 @@ export const createBooking = async (
     return data;
 };
 
+
 export const deleteBooking = async (bookingId: string): Promise<void> => {
     const response = await fetch(`${BASE_URL}/booking/delete/${encodeURIComponent(bookingId)}`, {
         method: 'DELETE',
@@ -68,4 +69,25 @@ export const deleteBooking = async (bookingId: string): Promise<void> => {
     if (!response.ok) {
         throw new Error(errorMessage(response));
     }
+};
+
+export const updateBooking = async (bookingId: string, payload: Partial<CreateBookingPayload>): Promise<BookingResponseType> => {
+    const response = await fetch(`${BASE_URL}/booking/update/${encodeURIComponent(bookingId)}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        throw new Error(errorMessage(response));
+    }
+
+    const data: BookingResponseType = await response.json();
+    if (!data) {
+        throw new Error('Failed to update booking');
+    }
+
+    return data;
 };
