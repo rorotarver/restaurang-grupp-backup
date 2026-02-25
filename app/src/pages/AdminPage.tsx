@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from "react";
-import { deleteBooking, getBookingsByRestaurant } from "../services/BookingService";
+import { deleteBooking, getBookingsByRestaurant, updateBooking } from "../services/BookingService";
 import { BookingFormData, BookingResponseType } from "../types/booking.types";
 
 
@@ -41,11 +41,15 @@ export default function AdminPage() {
       fetchBookings();
 },    [fetchBookings]);
 
-    const handleDeleteBooking = async (bookingId: string) => {
-        const shouldDelete = window.confirm('Är du säker på att du vill ta bort bokningen?');
-        if (!shouldDelete) {
-            return;
-        }
+ const handleDeleteBooking = async (bookingId: string) => {
+    const shouldDelete = window.confirm(
+        'Är du säker på att du vill ta bort bokningen?'
+    );
+
+    if (!shouldDelete) {
+        return;
+    }
+
 
         try {
             setDeletingBookingId(bookingId);
@@ -59,6 +63,17 @@ export default function AdminPage() {
         }
     };
 
+
+const handleSaveBooking = async () => {
+        if (!editingBooking) return;
+        await updateBooking(editingBooking.id, formData);
+        setBookings((prev) =>
+            prev.map((booking) =>
+                booking.id === editingBooking.id ? { ...booking, ...formData } : booking
+            )
+        );
+        setEditingBooking(null);
+    };
 
     if (loading) {
         return (
@@ -104,7 +119,7 @@ export default function AdminPage() {
                                 <td className="py-2 px-4">
                                    <button className="text-blue-500 mr-2" aria-label={`Redigera bokning ${booking.id}`} onClick={() => { 
                                     setEditingBooking(booking); 
-                                    setFormData(booking); }}>Redigera</button>
+                                    setFormData({ date: booking.date, time: booking.time, numberOfGuests: booking.numberOfGuests }); }}>Redigera</button>
                                    <button
                                        className="text-red-500 disabled:opacity-50"
                                        aria-label={`Ta bort bokning ${booking.id}`}
@@ -117,8 +132,46 @@ export default function AdminPage() {
                             </tr>
                         ))}
                     </tbody>
-                </table>
+                </table>   
             )}
+                {editingBooking && (
+                    <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg mt-4">
+                        <h2 className="text-xl font-bold mb-2">Redigera bokning</h2>
+                        <form onSubmit={async (e:React.FormEvent) => {
+                                e.preventDefault();
+
+                                try {
+
+                                setIsSaving(true);
+                                await handleSaveBooking();
+                                } 
+                                finally {
+                                setIsSaving(false);
+                                }
+                             }}>
+                            <input type="date" value={formData.date} onChange={(e) => 
+                                setFormData({ ...formData, date: e.target.value })} className="border p-2 mb-2 w-full" placeholder="Datum (YYYY-MM-DD)" required />
+                            <select
+                              value={formData.time}
+                              onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                              className="border p-2 mb-2 w-full"
+                              required
+>
+                             <option value="">Välj tid</option>
+                             <option value="18:00">18:00</option>
+                             <option value="21:00">21:00</option>
+                            </select>
+                            <input type="number" value={formData.numberOfGuests} onChange={(e) =>
+                                setFormData({ ...formData, numberOfGuests: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="border p-2 mb-2 w-full" placeholder="Antal gäster" required min={1} />
+                            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded" disabled={isSaving}>
+                                   {isSaving ? 'Sparar...' : 'Spara'}
+                            </button>
+                            <button type="button" className="bg-gray-500 text-white px-4 py-2 rounded ml-2" onClick={() => setEditingBooking(null)}>
+                                Avbryt
+                            </button>
+                            </form>
+                        </div>
+                    )}
             </div>
         </div>
     );
