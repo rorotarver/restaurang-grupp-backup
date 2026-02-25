@@ -61,7 +61,7 @@ export const createBooking = async (
 };
 
 export const deleteBooking = async (bookingId: string): Promise<void> => {
-    const response = await fetch(`${BASE_URL}/booking/${encodeURIComponent(bookingId)}`, {
+    const response = await fetch(`${BASE_URL}/booking/delete/${encodeURIComponent(bookingId)}`, {
         method: 'DELETE',
     });
 
