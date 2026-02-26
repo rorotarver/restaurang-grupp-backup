@@ -143,7 +143,13 @@ export default function BookingSearchForm({ onBookingSlotSelected }: BookingSear
             <form onSubmit={handleSearch} className="space-y-4">
                 <input type='date' value={state.date} onChange={(e) => dispatch({ type: 'SET_DATE', payload: e.target.value })} className="border p-2 w-full" />
                 <input type='number' min={1} max={6} value={state.numberOfGuests} onChange={(e) => dispatch({ type: 'SET_NUMBER_OF_GUESTS', payload: Number(e.target.value) })} className="border p-2 w-full" />
-                <button type='submit' disabled={state.isLoading} className="bg-blue-500 text-white px-4 py-2">{state.isLoading ? 'Söker...' : buttonText}</button>
+                <button
+                    type='submit'
+                    disabled={state.isLoading}
+                    className="hero-btn-boka"
+                >
+                    {state.isLoading ? 'Söker...' : buttonText}
+                </button>
             </form>
 
             {state.error && <p className="text-red-500 mt-2">{state.error}</p>}
