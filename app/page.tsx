@@ -38,7 +38,6 @@ export default function Home() {
   
   return (
     <div className="w-full min-h-screen">
-      <h1>Test</h1>
       <LandingPage />
     </div>
   );

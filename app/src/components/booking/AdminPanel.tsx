@@ -3,6 +3,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { deleteBooking, getBookingsByRestaurant, updateBooking, createBooking } from "../../services/BookingService";
 import { BookingFormData, BookingResponseType } from "../../types/booking.types";
+import { getRestaurantIdOrThrow } from "../../utils/restaurant";
+
+const sortBookingsByDateAndTime = (items: BookingResponseType[]): BookingResponseType[] => {
+  return [...items].sort((a, b) => {
+    const aDateTime = new Date(`${a.date}T${a.time}:00`).getTime();
+    const bDateTime = new Date(`${b.date}T${b.time}:00`).getTime();
+    return aDateTime - bDateTime;
+  });
+};
 
 export default function AdminPanel() {
     const [bookings, setBookings] = useState<BookingResponseType[]>([]);
@@ -19,16 +28,26 @@ export default function AdminPanel() {
         numberOfGuests: 1,
     });
 
-    const restaurantId =
-        process.env.NEXT_PUBLIC_RESTAURANT_ID || '6996f44b1f79230601108db6';
+    let restaurantId = '';
+    try {
+      restaurantId = getRestaurantIdOrThrow();
+    } catch {
+      restaurantId = '';
+    }
 
     const fetchBookings = useCallback(async () => {
+      if (!restaurantId) {
+        setFetchError("Restaurant ID saknas i .env.local");
+        setBookings([]);
+        return;
+      }
+
         try {
             setLoading(true);
             setFetchError(null);
 
             const data = await getBookingsByRestaurant(restaurantId);
-            setBookings(data);
+            setBookings(sortBookingsByDateAndTime(data));
 
         } catch (err: unknown) {
             setFetchError(err instanceof Error ? err.message : String("Ett okänt fel uppstod"));
@@ -71,10 +90,10 @@ export default function AdminPanel() {
               numberOfGuests: formData.numberOfGuests,
             });
             setBookings((prev) =>
-              prev.map((b) => (b.id === updated.id ? updated : b))
+              sortBookingsByDateAndTime(prev.map((b) => (b.id === updated.id ? updated : b)))
             );
           } else if (isCreating) {
-            const newBooking = await createBooking({
+            await createBooking({
               restaurantId,
               ...formData,
               customer: {
@@ -85,7 +104,6 @@ export default function AdminPanel() {
               },
             });
             await fetchBookings();
-            setBookings((prev) => [...prev, newBooking]);
           }
           closeForm();
           setFormData({ date: "", time: "18:00", numberOfGuests: 1 });

@@ -4,6 +4,7 @@ import { useState } from "react";
 import BookingSearchForm, { SelectedBookingSlot } from "./BookingSearchForm";
 import CustomerForm from "./CustomerForm";
 
+
 export default function BookingFlow() {
     const [selectedSlot, setSelectedSlot] = useState<SelectedBookingSlot | null>(null);
 
@@ -21,3 +22,4 @@ export default function BookingFlow() {
         </div>
     );
 }
+
