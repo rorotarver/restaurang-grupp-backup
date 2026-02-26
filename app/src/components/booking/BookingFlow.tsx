@@ -10,14 +10,14 @@ export default function BookingFlow() {
 
     if (selectedSlot === null) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+            <div className="w-full">
                 <BookingSearchForm onBookingSlotSelected={setSelectedSlot} />
             </div>
         );
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+        <div className="w-full">
             <CustomerForm selectedSlot={selectedSlot} onCancel={() => setSelectedSlot(null)} />
         </div>
     );

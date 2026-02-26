@@ -1,5 +1,6 @@
 import BookingFlow from "../src/components/booking/BookingFlow";
 import bakgrund from "../src/styles/Bilder/Bakgrund.jpg";
+import Link from "next/link";
 
 export default function Booking() {
   return (
@@ -10,9 +11,14 @@ export default function Booking() {
       <main className="landing-main">
         <section
           className="landing-section"
-          style={{ maxWidth: "640px", margin: "1.5rem auto" }}
+          style={{ maxWidth: "820px", margin: "1.25rem auto" }}
         >
-          <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+          <div style={{ marginBottom: "1rem" }}>
+            <Link href="/contact" className="landing-btn">
+              Kontakta oss
+            </Link>
+          </div>
+          <div className="w-full py-2">
             <BookingFlow />
           </div>
         </section>
@@ -47,7 +53,7 @@ export default function Booking() {
             </a>
           </div>
         </div>
-        <p className="footeropyright">
+        <p className="footer-copyright">
           &copy; Fantastic Four. Alla rättigheter förbehållna.
         </p>
       </footer>

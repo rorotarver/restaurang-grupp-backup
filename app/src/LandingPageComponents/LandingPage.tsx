@@ -17,7 +17,7 @@ export const LandingPage = () => {
           <p className="tagline">
             Upplev autentiska persiska rätter i en varm och välkomnande miljö.
           </p>
-          <Link href="/booking" className="hero-btn-boka">
+             <Link href="/booking" className="hero-btn-boka">
             Boka bord
           </Link>
         </div>

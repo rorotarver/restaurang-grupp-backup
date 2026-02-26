@@ -139,14 +139,14 @@ export default function BookingSearchForm({ onBookingSlotSelected }: BookingSear
     };
 
     return (
-        <section>
-            <form onSubmit={handleSearch} className="space-y-4">
-                <input type='date' value={state.date} onChange={(e) => dispatch({ type: 'SET_DATE', payload: e.target.value })} className="border p-2 w-full" />
-                <input type='number' min={1} max={6} value={state.numberOfGuests} onChange={(e) => dispatch({ type: 'SET_NUMBER_OF_GUESTS', payload: Number(e.target.value) })} className="border p-2 w-full" />
+        <section className="w-full max-w-xl mx-auto">
+            <form onSubmit={handleSearch} className="space-y-5 p-2 sm:p-4">
+                <input type='date' value={state.date} onChange={(e) => dispatch({ type: 'SET_DATE', payload: e.target.value })} className="border rounded-md p-3 w-full" />
+                <input type='number' min={1} max={6} value={state.numberOfGuests} onChange={(e) => dispatch({ type: 'SET_NUMBER_OF_GUESTS', payload: Number(e.target.value) })} className="border rounded-md p-3 w-full" />
                 <button
                     type='submit'
                     disabled={state.isLoading}
-                    className="hero-btn-boka"
+                    className="landing-btn-submit w-full sm:w-auto"
                 >
                     {state.isLoading ? 'Söker...' : buttonText}
                 </button>
@@ -163,14 +163,16 @@ export default function BookingSearchForm({ onBookingSlotSelected }: BookingSear
             {state.availableTimes.length > 0 && (
                 <div className="mt-4">
                     <p className="text-green-500 mb-2">Tillgängliga tider:</p>
-                    <ul>
+                    <ul className="space-y-2">
                         {state.availableTimes.map((time) => (
-                            <label key={time} className="flex items-center space-x-2">
-                                {time}
-                                <input type="radio" name="time" value={time} onChange={() => {
-                                    dispatch({ type: 'SELECT_TIME', payload: time });
-                                }} />
-                            </label>
+                            <li key={time}>
+                                <label className="flex items-center justify-between border rounded-md px-3 py-2">
+                                    <span>{time}</span>
+                                    <input type="radio" name="time" value={time} onChange={() => {
+                                        dispatch({ type: 'SELECT_TIME', payload: time });
+                                    }} />
+                                </label>
+                            </li>
                         ))}
                     </ul>
                 </div>

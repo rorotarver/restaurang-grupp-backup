@@ -89,12 +89,12 @@ if (!selectedSlot) {
 }
 
 return (
-    <div>
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <input type="text" placeholder="Förnamn" value={name} onChange={(e) => setName(e.target.value)} className="border p-2 w-full" />
-            <input type="text" placeholder="Efternamn" value={lastname} onChange={(e) => setLastname(e.target.value)} className="border p-2 w-full" />
-            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="border p-2 w-full" />
-            <input type="tel" placeholder="Telefonnummer" value={phone} onChange={(e) => setPhone(e.target.value)} className="border p-2 w-full" />
+    <div className="w-full max-w-xl mx-auto">
+        <form onSubmit={handleSubmit} className="space-y-5 p-2 sm:p-4">
+            <input type="text" placeholder="Förnamn" value={name} onChange={(e) => setName(e.target.value)} className="border rounded-md p-3 w-full" />
+            <input type="text" placeholder="Efternamn" value={lastname} onChange={(e) => setLastname(e.target.value)} className="border rounded-md p-3 w-full" />
+            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="border rounded-md p-3 w-full" />
+            <input type="tel" placeholder="Telefonnummer" value={phone} onChange={(e) => setPhone(e.target.value)} className="border rounded-md p-3 w-full" />
                 <div className="flex items-start gap-2">
                   <input className="" type="checkbox" id="gdpr-consent" checked={gdprAccepted} onChange={(e) => setGdprAccepted(e.target.checked)} />
                   <label htmlFor="gdpr-consent" className="text-sm leading-5">Jag accepterar GDPR-villkoren
@@ -105,14 +105,16 @@ return (
              <div>
                 <p><strong>Vald tid:</strong> {selectedSlot.date} kl {selectedSlot.time} · {selectedSlot.numberOfGuests} {selectedSlot.numberOfGuests === 1 ? 'gäst' : 'gäster'}</p>
              </div>
-            <button
-                type="submit"
-                disabled={isSubmitting || !gdprAccepted}
-                className="hero-btn-boka"
-            >
-                {isSubmitting ? 'Skickar...' : 'Bekräfta bokning'}
-            </button>
-            <button type="button" onClick={onCancel} className="bg-gray-500 text-white px-4 py-2">Avbryt</button>
+            <div className="flex flex-wrap gap-3 pt-1">
+                <button
+                    type="submit"
+                    disabled={isSubmitting || !gdprAccepted}
+                    className="landing-btn-submit w-full sm:w-auto"
+                >
+                    {isSubmitting ? 'Skickar...' : 'Bekräfta bokning'}
+                </button>
+                <button type="button" onClick={onCancel} className="bg-gray-500 text-white px-4 py-2 rounded-md w-full sm:w-auto">Avbryt</button>
+            </div>
         </form>
         {error && <p className="text-red-500">{error}</p>}
         {successMessage && <p className="text-green-500">{successMessage}</p>}
