@@ -1,44 +1,59 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/NkiRz8t6)
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Fantastic Four Restaurant
 
-## Getting Started
+Skolprojekt i Next.js + TypeScript för restaurang med bokningsflöde och admin-CRUD mot School Restaurant API.
 
-First, run the development server:
+## Sidor
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- `/` Startsida
+- `/booking` Bokningssida
+- `/contact` Kontaktsida
+- `/admin` Admin (CRUD)
+
+## Teknisk översikt
+
+- Framework: Next.js (App Router)
+- Språk: TypeScript
+- Styling: global CSS + Tailwind utility classes
+- API: `https://school-restaurant-api.azurewebsites.net`
+
+## Miljövariabler
+
+Skapa filen `.env.local` i projektroten:
+
+```env
+NEXT_PUBLIC_RESTAURANT_ID=DIN_RESTAURANG_ID
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`NEXT_PUBLIC_RESTAURANT_ID` används i bokning/admin för att hämta och skriva bokningar mot rätt restaurang.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Kom igång
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+Öppna `http://localhost:3000`.
 
-To learn more about Next.js, take a look at the following resources:
+## Bokningsflöde
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Sökning kan göras på **datum eller vecka**.
+- Användaren väljer antal gäster (1–6).
+- Lediga sittningar beräknas för 18:00 och 21:00 (max 15 bord per sittning).
+- Användaren fyller kunduppgifter och måste godkänna GDPR för att kunna slutföra bokning.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Adminflöde
 
-## Deploy on Vercel
+- Lista alla bokningar för vald restaurang
+- Skapa ny bokning
+- Redigera bokning
+- Ta bort/avboka bokning
+- Sortering på datum/tid (närmast först/senast först)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Snabb test-check
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-## Test Flow (Booking > Admin)
-
-- Starta appen
-- skapa bokning på /booking
-- verifiera på /admin
-- testa edit + delete
+1. Gå till `/booking`
+2. Sök datum/vecka och välj en ledig tid
+3. Slutför bokning
+4. Gå till `/admin` och verifiera att bokningen syns
+5. Testa redigering och borttagning
