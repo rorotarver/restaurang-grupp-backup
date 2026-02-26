@@ -24,12 +24,8 @@ export interface CreateBookingPayload {
 }
 
 export interface CreateBookingResponse {
-    id: string;
-    restaurantId: string;
-    date: string;
-    time: string;
-    numberOfGuests: number;
-    customerId: string;
+    acknowledged: boolean;
+    insertedId: string;
 }
 
 export interface UpdateBookingPayload {

@@ -76,12 +76,27 @@ export const createBooking = async (
         throw new Error(errorMessage(response));
     }
 
-    const data: RawBookingResponse = await response.json();
+    const data = await response.json() as {
+        acknowledged?: boolean;
+        insertedId?: string;
+    } & RawBookingResponse;
+
     if (!data) {
         throw new Error('Failed to create booking');
     }
 
-    return normalizeBooking(data) as CreateBookingResponse;
+    if (data.acknowledged && data.insertedId) {
+        return {
+            acknowledged: data.acknowledged,
+            insertedId: data.insertedId,
+        };
+    }
+
+    const normalized = normalizeBooking(data);
+    return {
+        acknowledged: true,
+        insertedId: normalized.id,
+    };
 };
 
 
