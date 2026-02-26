@@ -1,5 +1,4 @@
 import Link from "next/link";
-import "./LandingPage.scss";
 
 import bakgrund from "../styles/Bilder/Bakgrund.jpg";
 import mat2 from "../styles/Bilder/mat2.jpeg";

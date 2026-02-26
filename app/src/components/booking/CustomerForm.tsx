@@ -54,7 +54,7 @@ export default function CustomerForm({ selectedSlot, onCancel }: CustomerFormPro
        try {
         
         await createBooking({
-                restaurantId: '6996f44b1f79230601108db6', // Ersätt med korrekt restaurantId
+                restaurantId: process.env.NEXT_PUBLIC_RESTAURANT_ID || '', // Ersätt med korrekt restaurantId
                 date: selectedSlot!.date,
                 time: selectedSlot!.time,
                 numberOfGuests: selectedSlot!.numberOfGuests,
