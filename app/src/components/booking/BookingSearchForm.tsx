@@ -3,7 +3,7 @@
 import { FormEvent, useReducer } from 'react';
 import { getBookingsByRestaurant } from '../../services/BookingService';
 
-export const RESTAURANT_ID: string = '6996f44b1f79230601108db6'; // Ersätt med korrekt restaurantId
+export const RESTAURANT_ID: string = process.env.NEXT_PUBLIC_RESTAURANT_ID || ''; // Ersätt med korrekt restaurantId
 
 
 
