@@ -19,6 +19,7 @@ export default function CustomerForm({ selectedSlot, onCancel }: CustomerFormPro
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [gdprAccepted, setGdprAccepted] = useState(false);
+    const [gdprError, setGdprError] = useState<string | null>(null);
 
 
 
@@ -26,6 +27,7 @@ export default function CustomerForm({ selectedSlot, onCancel }: CustomerFormPro
      const handleSubmit = async (e: FormEvent) => {
 
         setError(null);
+          setGdprError(null);
         
         e.preventDefault();
         if (!name || !lastname || !email || !phone) {
@@ -46,7 +48,7 @@ export default function CustomerForm({ selectedSlot, onCancel }: CustomerFormPro
        setIsSubmitting(true);
 
        if (!gdprAccepted) {
-            setError('Du måste acceptera GDPR-villkoren för att fortsätta');
+          setGdprError('Du måste acceptera GDPR-villkoren för att fortsätta.');
             setIsSubmitting(false);
             return;
         }
@@ -96,10 +98,16 @@ return (
             <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="border rounded-md p-3 w-full" />
             <input type="tel" placeholder="Telefonnummer" value={phone} onChange={(e) => setPhone(e.target.value)} className="border rounded-md p-3 w-full" />
                 <div className="flex items-start gap-2">
-                  <input className="" type="checkbox" id="gdpr-consent" checked={gdprAccepted} onChange={(e) => setGdprAccepted(e.target.checked)} />
+                                    <input className="" type="checkbox" id="gdpr-consent" checked={gdprAccepted} onChange={(e) => {
+                                        setGdprAccepted(e.target.checked);
+                                        if (e.target.checked) {
+                                            setGdprError(null);
+                                        }
+                                    }} />
                   <label htmlFor="gdpr-consent" className="text-sm leading-5">Jag accepterar GDPR-villkoren
                   </label>
                 </div>
+                                {gdprError && <p className="text-red-500 text-sm">{gdprError}</p>}
             
                 <p className="text-sm text-gray-600">Vi bryr oss om din integritet och hanterar dina uppgifter med omsorg. Dina uppgifter kommer endast att användas för bokningsändamål.</p>
              <div>
@@ -108,7 +116,7 @@ return (
             <div className="flex flex-wrap gap-3 pt-1">
                 <button
                     type="submit"
-                    disabled={isSubmitting || !gdprAccepted}
+                    disabled={isSubmitting}
                     className="landing-btn-submit w-full sm:w-auto"
                 >
                     {isSubmitting ? 'Skickar...' : 'Bekräfta bokning'}
