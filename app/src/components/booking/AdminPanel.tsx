@@ -3,6 +3,20 @@
 import { useState, useEffect, useCallback } from "react";
 import { deleteBooking, getBookingsByRestaurant, updateBooking, createBooking } from "../../services/BookingService";
 import { BookingFormData, BookingResponseType } from "../../types/booking.types";
+import { getRestaurantIdOrThrow } from "../../utils/restaurant";
+
+type SortOrder = 'asc' | 'desc';
+
+const sortBookingsByDateAndTime = (
+  items: BookingResponseType[],
+  sortOrder: SortOrder,
+): BookingResponseType[] => {
+  return [...items].sort((a, b) => {
+    const aDateTime = new Date(`${a.date}T${a.time}:00`).getTime();
+    const bDateTime = new Date(`${b.date}T${b.time}:00`).getTime();
+    return sortOrder === 'asc' ? aDateTime - bDateTime : bDateTime - aDateTime;
+  });
+};
 
 export default function AdminPanel() {
     const [bookings, setBookings] = useState<BookingResponseType[]>([]);
@@ -13,29 +27,40 @@ export default function AdminPanel() {
     const [editingBooking, setEditingBooking] = useState<BookingResponseType | null>(null);
     const [isCreating, setIsCreating] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const [formData, setFormData] = useState<BookingFormData>({
         date: '',
         time: '18:00',
         numberOfGuests: 1,
     });
 
-    const restaurantId =
-        process.env.NEXT_PUBLIC_RESTAURANT_ID || '6996f44b1f79230601108db6';
+    let restaurantId = '';
+    try {
+      restaurantId = getRestaurantIdOrThrow();
+    } catch {
+      restaurantId = '';
+    }
 
     const fetchBookings = useCallback(async () => {
+      if (!restaurantId) {
+        setFetchError("Restaurant ID saknas i .env.local");
+        setBookings([]);
+        return;
+      }
+
         try {
             setLoading(true);
             setFetchError(null);
 
             const data = await getBookingsByRestaurant(restaurantId);
-            setBookings(data);
+            setBookings(sortBookingsByDateAndTime(data, sortOrder));
 
         } catch (err: unknown) {
             setFetchError(err instanceof Error ? err.message : String("Ett okänt fel uppstod"));
         } finally {
             setLoading(false);
         }
-    }, [restaurantId]);
+        }, [restaurantId, sortOrder]);
 
     useEffect(() => {
       fetchBookings();
@@ -71,10 +96,13 @@ export default function AdminPanel() {
               numberOfGuests: formData.numberOfGuests,
             });
             setBookings((prev) =>
-              prev.map((b) => (b.id === updated.id ? updated : b))
+              sortBookingsByDateAndTime(
+                prev.map((b) => (b.id === updated.id ? updated : b)),
+                sortOrder,
+              )
             );
           } else if (isCreating) {
-            const newBooking = await createBooking({
+            await createBooking({
               restaurantId,
               ...formData,
               customer: {
@@ -85,7 +113,6 @@ export default function AdminPanel() {
               },
             });
             await fetchBookings();
-            setBookings((prev) => [...prev, newBooking]);
           }
           closeForm();
           setFormData({ date: "", time: "18:00", numberOfGuests: 1 });
@@ -129,6 +156,19 @@ export default function AdminPanel() {
         >
           Skapa ny bokning
         </button>
+
+        <div className="mb-4 flex items-center gap-2">
+          <label htmlFor="sort-order" className="text-sm">Sortering:</label>
+          <select
+            id="sort-order"
+            className="border p-2 rounded"
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as SortOrder)}
+          >
+            <option value="asc">Närmast först</option>
+            <option value="desc">Senast först</option>
+          </select>
+        </div>
 
         {(editingBooking || isCreating) && (
           <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
