@@ -3,6 +3,7 @@
 import { createBooking } from "../../services/BookingService";
 import { SelectedBookingSlot } from "./BookingSearchForm"
 import { FormEvent, useState } from "react";
+import { getRestaurantIdOrThrow } from "../../utils/restaurant";
 
 export type CustomerFormProps = {
     selectedSlot: SelectedBookingSlot | null;
@@ -52,9 +53,10 @@ export default function CustomerForm({ selectedSlot, onCancel }: CustomerFormPro
 
 
        try {
+    const restaurantId = getRestaurantIdOrThrow();
         
         await createBooking({
-                restaurantId: process.env.NEXT_PUBLIC_RESTAURANT_ID || '', // Ersätt med korrekt restaurantId
+        restaurantId,
                 date: selectedSlot!.date,
                 time: selectedSlot!.time,
                 numberOfGuests: selectedSlot!.numberOfGuests,

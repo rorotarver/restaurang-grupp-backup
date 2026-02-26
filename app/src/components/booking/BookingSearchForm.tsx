@@ -2,10 +2,15 @@
 
 import { FormEvent, useReducer } from 'react';
 import { getBookingsByRestaurant } from '../../services/BookingService';
+import { getRestaurantIdOrThrow } from '../../utils/restaurant';
 
-export const RESTAURANT_ID: string = process.env.NEXT_PUBLIC_RESTAURANT_ID || ''; // Ersätt med korrekt restaurantId
-
-
+export const RESTAURANT_ID: string = (() => {
+    try {
+        return getRestaurantIdOrThrow();
+    } catch {
+        return '';
+    }
+})();
 
 
 // Bokningsflödets UI-state: sökinput, async-status och resultat av tillgängliga tider.
@@ -111,6 +116,10 @@ export default function BookingSearchForm({ onBookingSlotSelected }: BookingSear
         dispatch({ type: 'SEARCH_START' });
 
         try {
+            if (!RESTAURANT_ID) {
+                dispatch({ type: 'SEARCH_FAILURE', payload: 'Restaurant ID saknas i .env.local' });
+                return;
+            }
             const bookings = await getBookingsByRestaurant(RESTAURANT_ID);
             const sameDate = bookings.filter((b) => b.date === state.date);
 
