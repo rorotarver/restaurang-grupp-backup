@@ -103,7 +103,11 @@ return (
              <div>
                 <p><strong>Vald tid:</strong> {selectedSlot.date} kl {selectedSlot.time} · {selectedSlot.numberOfGuests} {selectedSlot.numberOfGuests === 1 ? 'gäst' : 'gäster'}</p>
              </div>
-            <button type="submit" disabled={isSubmitting || !gdprAccepted} className="bg-green-500 text-white p-4 py-2">
+            <button
+                type="submit"
+                disabled={isSubmitting || !gdprAccepted}
+                className="hero-btn-boka"
+            >
                 {isSubmitting ? 'Skickar...' : 'Bekräfta bokning'}
             </button>
             <button type="button" onClick={onCancel} className="bg-gray-500 text-white px-4 py-2">Avbryt</button>
