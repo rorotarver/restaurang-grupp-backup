@@ -18,13 +18,17 @@ Skolprojekt i Next.js + TypeScript för restaurang med bokningsflöde och admin-
 
 ## Miljövariabler
 
-Skapa filen `.env.local` i projektroten:
+Kopiera först `.env.example` till `.env.local` i projektroten och justera värdet vid behov.
+
+Exempelinnehåll:
 
 ```env
 NEXT_PUBLIC_RESTAURANT_ID=DIN_RESTAURANG_ID
 ```
 
 `NEXT_PUBLIC_RESTAURANT_ID` används i bokning/admin för att hämta och skriva bokningar mot rätt restaurang.
+
+Om `.env.local` saknas används ett fallback-ID i appen för att undvika att bokning/admin blockerats lokalt.
 
 ## Kom igång
 
