@@ -96,6 +96,14 @@ const toIsoDate = (date: Date): string => {
     return date.toISOString().split('T')[0];
 };
 
+const getTodayLocalIsoDate = (): string => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 const getWeekDates = (week: string): string[] => {
     const match = week.match(/^(\d{4})-W(\d{2})$/);
     if (!match) return [];
@@ -121,6 +129,7 @@ const getWeekDates = (week: string): string[] => {
 
 export default function BookingSearchForm({ onBookingSlotSelected }: BookingSearchFormProps) {  
     const [state, dispatch] = useReducer(reducer, initialState);  
+    const todayIso = getTodayLocalIsoDate();
     let buttonText = 'Sök tider';
     
     if (state.hasSearched && state.availableSlots.length > 0) buttonText = 'Fortsätt';
@@ -160,6 +169,11 @@ export default function BookingSearchForm({ onBookingSlotSelected }: BookingSear
             dispatch({ type: 'SEARCH_FAILURE', payload: 'Antal gäster måste vara mellan 1 och 6' });
             return;
         }
+
+        if (state.date && state.date < todayIso) {
+            dispatch({ type: 'SEARCH_FAILURE', payload: 'Du kan inte boka ett datum som redan har passerat.' });
+            return;
+        }
         
         dispatch({ type: 'SEARCH_START' });
 
@@ -181,7 +195,14 @@ export default function BookingSearchForm({ onBookingSlotSelected }: BookingSear
                 return slots;
             };
 
-            const datesToCheck = state.date ? [state.date] : getWeekDates(state.week);
+            const datesToCheck = (state.date ? [state.date] : getWeekDates(state.week))
+                .filter((date) => date >= todayIso);
+
+            if (!state.date && state.week && datesToCheck.length === 0) {
+                dispatch({ type: 'SEARCH_FAILURE', payload: 'Vald vecka har inga bokningsbara datum kvar.' });
+                return;
+            }
+
             const availableSlots = datesToCheck.flatMap(computeSlotsForDate);
 
             dispatch({ type: 'SEARCH_SUCCESS', payload: availableSlots });
@@ -194,7 +215,7 @@ export default function BookingSearchForm({ onBookingSlotSelected }: BookingSear
     return (
         <section className="w-full max-w-xl mx-auto">
             <form onSubmit={handleSearch} className="space-y-5 p-2 sm:p-4">
-                <input type='date' value={state.date} onChange={(e) => dispatch({ type: 'SET_DATE', payload: e.target.value })} className="border rounded-md p-3 w-full" />
+                <input type='date' min={todayIso} value={state.date} onChange={(e) => dispatch({ type: 'SET_DATE', payload: e.target.value })} className="border rounded-md p-3 w-full" />
                 <input type='week' value={state.week} onChange={(e) => dispatch({ type: 'SET_WEEK', payload: e.target.value })} className="border rounded-md p-3 w-full" />
                 <input type='number' min={1} max={6} value={state.numberOfGuests} onChange={(e) => dispatch({ type: 'SET_NUMBER_OF_GUESTS', payload: Number(e.target.value) })} className="border rounded-md p-3 w-full" />
                 <button

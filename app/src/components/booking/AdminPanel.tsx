@@ -18,6 +18,14 @@ const sortBookingsByDateAndTime = (
   });
 };
 
+const getTodayLocalIsoDate = (): string => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export default function AdminPanel() {
     const [bookings, setBookings] = useState<BookingResponseType[]>([]);
     const [loading, setLoading] = useState(false);
@@ -33,6 +41,7 @@ export default function AdminPanel() {
         time: '18:00',
         numberOfGuests: 1,
     });
+    const todayIso = getTodayLocalIsoDate();
 
     let restaurantId = '';
     try {
@@ -82,6 +91,12 @@ export default function AdminPanel() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!restaurantId) return setFormError("Restaurant ID saknas");
+
+        if (formData.date < todayIso) {
+          setFormError("Du kan inte skapa eller redigera en bokning till ett datum som redan har passerat.");
+          return;
+        }
+
         setIsSaving(true);
         setFormError(null);
 
@@ -178,6 +193,7 @@ export default function AdminPanel() {
 
             <input
               type="date"
+              min={todayIso}
               value={formData.date}
               onChange={(e) => setFormData({ ...formData, date: e.target.value })}
               className="border p-2 mb-2 w-full"
