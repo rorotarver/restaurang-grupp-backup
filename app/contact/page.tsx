@@ -17,25 +17,6 @@ export default function ContactPage() {
 						Har du frågor om bokning, allergier eller större sällskap? Hör av dig så hjälper vi dig gärna.
 					</p>
 
-					<div className="landing-info-grid">
-						<div className="landing-info-block">
-							<h2>Telefon</h2>
-							<a href="tel:+4681234567">08-123 45 67</a>
-						</div>
-						<div className="landing-info-block">
-							<h2>E-post</h2>
-							<a href="mailto:info@fantasticfour.se">info@fantasticfour.se</a>
-						</div>
-						<div className="landing-info-block">
-							<h2>Adress</h2>
-							<address>
-								Fantastic Street 123
-								<br />
-								12345 Stockholm
-							</address>
-						</div>
-					</div>
-
 					<section className="landing-section" style={{ marginTop: "1rem" }}>
 						<h2>Skicka meddelande</h2>
 						<form className="landing-form" action="#" method="post">
@@ -56,6 +37,25 @@ export default function ContactPage() {
 							</button>
 						</form>
 					</section>
+
+					<div className="landing-info-grid" style={{ marginTop: "1.5rem" }}>
+						<div className="landing-info-block">
+							<h2>Telefon</h2>
+							<a href="tel:+4681234567">08-123 45 67</a>
+						</div>
+						<div className="landing-info-block">
+							<h2>E-post</h2>
+							<a href="mailto:info@fantasticfour.se">info@fantasticfour.se</a>
+						</div>
+						<div className="landing-info-block">
+							<h2>Adress</h2>
+							<address>
+								Fantastic Street 123
+								<br />
+								12345 Stockholm
+							</address>
+						</div>
+					</div>
 				</section>
 			</main>
 
