@@ -1,3 +1,6 @@
+"use client";
+
+import { FormEvent, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -7,6 +10,14 @@ import mat3 from "../styles/Bilder/mat3.jpg";
 import persiskMat1 from "../styles/Bilder/Persiskmat1.jpg";
 
 export const LandingPage = () => {
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    event.currentTarget.reset();
+    setSuccessMessage("Tack! Ditt meddelande har skickats.");
+  };
+
   return (
     <div className="landing-page">
       <header
@@ -70,7 +81,7 @@ export const LandingPage = () => {
 
         <section className="landing-section">
           <h2>Kontakta oss</h2>
-          <form className="landing-form" action="#" method="post">
+          <form className="landing-form" onSubmit={handleSubmit}>
             <label htmlFor="name">Namn</label>
             <input type="text" id="name" name="name" required />
 
@@ -87,6 +98,7 @@ export const LandingPage = () => {
               Skicka
             </button>
           </form>
+          {successMessage && <p className="text-green-600 mt-3">{successMessage}</p>}
         </section>
       </main>
 

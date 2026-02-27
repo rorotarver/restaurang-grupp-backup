@@ -1,7 +1,18 @@
+"use client";
+
+import { FormEvent, useState } from "react";
 import bakgrund from "../src/styles/Bilder/Bakgrund.jpg";
 import Link from "next/link";
 
 export default function ContactPage() {
+	const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		event.currentTarget.reset();
+		setSuccessMessage("Tack! Ditt meddelande har skickats.");
+	};
+
 	return (
 		<div
 			className="landing-page"
@@ -19,7 +30,7 @@ export default function ContactPage() {
 
 					<section className="landing-section" style={{ marginTop: "1rem" }}>
 						<h2>Skicka meddelande</h2>
-						<form className="landing-form" action="#" method="post">
+						<form className="landing-form" onSubmit={handleSubmit}>
 							<label htmlFor="name">Namn</label>
 							<input type="text" id="name" name="name" required />
 
@@ -36,6 +47,7 @@ export default function ContactPage() {
 								Skicka
 							</button>
 						</form>
+						{successMessage && <p className="text-green-600 mt-3">{successMessage}</p>}
 					</section>
 
 					<div className="landing-info-grid" style={{ marginTop: "1.5rem" }}>
