@@ -74,7 +74,7 @@ export default function CustomerForm({ selectedSlot, onCancel }: CustomerFormPro
         
             
             setSuccessMessage('Bokning skickad!');
-        } catch (error) {
+        } catch {
             setError('Ett fel uppstod vid bokning. Vänligen försök igen.');
         } finally {
             setIsSubmitting(false);

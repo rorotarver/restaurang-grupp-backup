@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 import bakgrund from "../styles/Bilder/Bakgrund.jpg";
 import mat2 from "../styles/Bilder/mat2.jpeg";
@@ -27,9 +28,9 @@ export const LandingPage = () => {
         <section className="landing-section landing-gallery-section">
           <h2>Våra rätter</h2>
           <div className="landing-gallery">
-            <img src={mat2.src} alt="Persisk maträtt" />
-            <img src={mat3.src} alt="Persisk maträtt" />
-            <img src={persiskMat1.src} alt="Persisk maträtt" />
+            <Image src={mat2} alt="Persisk maträtt" />
+            <Image src={mat3} alt="Persisk maträtt" />
+            <Image src={persiskMat1} alt="Persisk maträtt" />
           </div>
         </section>
 
